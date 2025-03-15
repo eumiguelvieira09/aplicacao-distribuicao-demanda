@@ -1,0 +1,80 @@
+/* src/pages/Login.css */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #1e1e2f; /* Fundo escuro, mas não preto */
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.login-box {
+    background-color: #2a2a40; /* Cor de fundo do box */
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: 300px;
+    text-align: center;
+}
+
+.login-box h1 {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.login-input {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid #444;
+    border-radius: 5px;
+    background-color: #3a3a5c; /* Cor de fundo dos inputs */
+    color: #fff;
+    font-size: 1rem;
+}
+
+.login-input::placeholder {
+    color: #bbb;
+}
+
+.login-button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #6c5ce7; /* Cor do botão */
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+    background-color: #5a4fcf; /* Cor do botão ao passar o mouse */
+}
+
+.toggle-text {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+.toggle-link {
+    color: #6c5ce7; /* Cor do link */
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+.toggle-link:hover {
+    color: #5a4fcf; /* Cor do link ao passar o mouse */
+}
