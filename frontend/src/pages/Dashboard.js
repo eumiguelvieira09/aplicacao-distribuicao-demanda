@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { useNavigate } from 'react-router-dom';
-import './Dashboard.css'; // Importe o arquivo CSS
+import '../styles/Dashboard.css'; // Importe o arquivo CSS
 
 const Dashboard = () => {
     const [tasks, setTasks] = useState([]);
@@ -23,6 +23,30 @@ const Dashboard = () => {
     const navigate = useNavigate();
     const [showStatusPopup, setShowStatusPopup] = useState(false); // Controla a visibilidade do popup de notificação
     const [movedTask, setMovedTask] = useState(null); // Armazena a tarefa que foi movida
+    const [refreshKey, setRefreshKey] = useState(0); // Adicione este estado
+
+    // Labels predefinidas
+    const predefinedLabels = [
+        { id: 'bug', name: 'Bug', color: '#e53e3e' },
+        { id: 'feature', name: 'Feature', color: '#38a169' },
+        { id: 'enhancement', name: 'Melhoria', color: '#805ad5' },
+        { id: 'documentation', name: 'Documentação', color: '#3182ce' },
+        { id: 'design', name: 'Design', color: '#d69e2e' },
+        { id: 'test', name: 'Teste', color: '#718096' },
+        { id: 'high', name: 'Alta Prioridade', color: '#e53e3e' },
+        { id: 'medium', name: 'Média Prioridade', color: '#d69e2e' },
+        { id: 'low', name: 'Baixa Prioridade', color: '#38a169' },
+    ];
+
+    // Função para alternar a seleção de uma label
+    const toggleLabel = (labelId) => {
+        setNewTask(prev => ({
+            ...prev,
+            labels: prev.labels.includes(labelId)
+                ? prev.labels.filter(id => id !== labelId)
+                : [...prev.labels, labelId]
+        }));
+    };
 
     // Busca as tarefas e usuários do backend
     useEffect(() => {
@@ -48,7 +72,7 @@ const Dashboard = () => {
             }
         };
         fetchData();
-    }, [navigate]);
+    }, [navigate, refreshKey]); // Adicione refreshKey como dependência
 
     // Função para lidar com o arrastar e soltar
     const onDragEnd = (result) => {
@@ -127,6 +151,7 @@ const Dashboard = () => {
                 setTasks([...tasks, response.data]); // Adiciona a nova tarefa ao estado
                 setFeedback({ type: 'success', message: 'Tarefa criada com sucesso!' });
                 setTimeout(() => closePopup(), 2000); // Fecha o pop-up após 2 segundos
+                setRefreshKey(oldKey => oldKey + 1); // Força o recarregamento dos dados
             } else {
                 throw new Error('Dados da tarefa inválidos');
             }
@@ -171,7 +196,11 @@ const Dashboard = () => {
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
-                    <button className="create-task-button" onClick={openPopup}>
+                    <button 
+                        className="create-task-button" 
+                        onClick={() => setShowPopup(true)}
+                        style={{ backgroundColor: '#4f46e5' }}
+                    >
                         Criar Tarefa
                     </button>
                 </div>
@@ -195,14 +224,18 @@ const Dashboard = () => {
                                                         ref={provided.innerRef}
                                                         {...provided.draggableProps}
                                                         {...provided.dragHandleProps}
-                                                        className={`task ${task.status}`} // Adiciona a classe do status
+                                                        className={`task ${task.status}`}
                                                         style={provided.draggableProps.style}
                                                         onClick={() => navigate(`/task/${task.id}`)}
                                                     >
                                                         <h3>{task.title || 'Tarefa sem título'}</h3>
                                                         <p>{task.description}</p>
                                                         <p>Prazo: {task.deadline}</p>
-                                                        <p>Responsáveis: {task.assignees && Array.isArray(task.assignees) ? task.assignees.join(', ') : 'Nenhum'}</p>
+                                                        <p>Responsáveis: {
+                                                            Array.isArray(task.assignees) && task.assignees.length > 0
+                                                                ? task.assignees.join(', ')
+                                                                : 'Nenhum responsável'
+                                                        }</p>
                                                     </div>
                                                 )}
                                             </Draggable>
@@ -245,6 +278,26 @@ const Dashboard = () => {
                             value={newTask.deadline}
                             onChange={handleInputChange}
                         />
+
+                        <div className="labels-section">
+                            <h3>Labels:</h3>
+                            <div className="labels-container">
+                                {predefinedLabels.map(label => (
+                                    <div
+                                        key={label.id}
+                                        className={`label-item ${newTask.labels.includes(label.id) ? 'selected' : ''}`}
+                                        onClick={() => toggleLabel(label.id)}
+                                    >
+                                        <div 
+                                            className="label-color"
+                                            style={{ backgroundColor: label.color }}
+                                        />
+                                        <span className="label-text">{label.name}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
                         <div className="assignees-section">
                             <h3>Atribuir a:</h3>
                             <div className="dropdown">

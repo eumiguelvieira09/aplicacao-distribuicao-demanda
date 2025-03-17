@@ -31,31 +31,37 @@ body {
 .search-bar {
     display: flex;
     align-items: center;
+    gap: 16px; /* Espaçamento entre a barra de pesquisa e o botão */
 }
 
 .search-bar input {
-    width: 200px; /* Largura menor para a barra de pesquisa */
-    padding: 8px;
+    width: 200px;
+    padding: 10px 16px; /* Aumentando o padding vertical para ficar da mesma altura do botão */
     border: 1px solid #444;
-    border-radius: 5px;
+    border-radius: 6px;
     font-size: 0.9rem;
-    background-color: #2a2a3f; /* Fundo escuro para a barra de pesquisa */
-    color: #ffffff; /* Texto branco */
+    background-color: #2a2a3f;
+    color: #ffffff;
+    height: 42px; /* Altura fixa igual ao botão */
 }
 
 .create-task-button {
     padding: 10px 20px;
-    background-color: #3498db; /* Azul */
+    background-color: #3498db;
     color: #fff;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
     font-size: 1rem;
     transition: background-color 0.3s ease;
+    height: 42px; /* Altura fixa igual ao input */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .create-task-button:hover {
-    background-color: #2980b9; /* Azul mais escuro */
+    background-color: #2980b9;
 }
 
 .kanban-board {
@@ -337,3 +343,98 @@ body {
 .task.canceled {
     border-left: 5px solid #e74c3c; /* Vermelho para "Cancelado" */
 }
+
+.task .assignees-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.task .assignee-tag {
+    background-color: #3498db;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    display: inline-block;
+}
+
+.task .assignees-label {
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+
+.labels-section {
+    margin-bottom: 15px;
+}
+
+.labels-section h3 {
+    margin-bottom: 10px;
+    color: #ffffff;
+}
+
+.labels-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.label-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background-color: #3a3a4f;
+    border: 1px solid #444;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.label-item.selected {
+    background-color: #4a5568;
+    border-color: #718096;
+}
+
+.label-item:hover {
+    background-color: #4a5568;
+}
+
+.label-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.label-text {
+    color: #ffffff;
+    font-size: 0.9rem;
+}
+
+.task .labels-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.task .label-tag {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    color: white;
+    display: inline-block;
+}
+
+/* Cores predefinidas para labels */
+.label-bug { background-color: #e53e3e; }
+.label-feature { background-color: #38a169; }
+.label-enhancement { background-color: #805ad5; }
+.label-documentation { background-color: #3182ce; }
+.label-design { background-color: #d69e2e; }
+.label-test { background-color: #718096; }
+.label-high { background-color: #e53e3e; }
+.label-medium { background-color: #d69e2e; }
+.label-low { background-color: #38a169; }

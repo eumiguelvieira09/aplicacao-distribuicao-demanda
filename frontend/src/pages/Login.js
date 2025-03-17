@@ -1,66 +1,145 @@
 // src/pages/Login.js
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import './Login.css'; // Importe o arquivo CSS para estilização
+import axios from 'axios';
+import LoginForm from '../components/LoginForm';
+import '../styles/Login.css'; // Importe o arquivo CSS para estilização
+
+const axiosInstance = axios.create({
+    baseURL: 'http://localhost:5000',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    withCredentials: true
+});
+
+axios.interceptors.request.use(request => {
+    console.log('Request:', request);
+    return request;
+});
+
+axios.interceptors.response.use(
+    response => {
+        console.log('Response:', response);
+        return response;
+    },
+    error => {
+        console.error('Response Error:', error);
+        return Promise.reject(error);
+    }
+);
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [isLogin, setIsLogin] = useState(true); // Controla se é login ou cadastro
+    const [isLogin, setIsLogin] = useState(true);
+    const [role, setRole] = useState('developer');
+    const [error, setError] = useState('');
     const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        if (!username || !password) {
+            setError('Username and password are required');
+            return;
+        }
+
+        if (isLogin) {
+            await handleLogin();
+        } else {
+            await handleSignup();
+        }
+    };
 
     const handleLogin = async () => {
         try {
-            const response = await axios.post('http://localhost:5000/api/login', { username, password });
-            localStorage.setItem('token', response.data.token);
-            navigate('/dashboard');
+            console.log('Tentando fazer login com:', { username, password });
+            
+            if (!username || !password) {
+                setError('Username e senha são obrigatórios');
+                return;
+            }
+
+            const response = await axiosInstance.post('/api/auth/login', { 
+                username: username.trim(), 
+                password: password.trim() 
+            });
+
+            console.log('Resposta do login:', response.data);
+            
+            if (response.data.token) {
+                localStorage.setItem('token', response.data.token);
+                navigate('/dashboard');
+            } else {
+                setError('Token não recebido do servidor');
+            }
         } catch (error) {
-            console.error('Login failed:', error);
-            alert('Login failed. Please check your credentials.');
+            console.error('Erro detalhado do login:', {
+                message: error.message,
+                response: error.response?.data,
+                status: error.response?.status
+            });
+            
+            if (error.response?.status === 400) {
+                setError('Usuário ou senha inválidos');
+            } else if (error.response?.status === 404) {
+                setError('Servidor não encontrado. Verifique se o backend está rodando.');
+            } else {
+                setError(error.response?.data?.message || 'Erro ao fazer login. Tente novamente.');
+            }
         }
     };
 
     const handleSignup = async () => {
         try {
-            const response = await axios.post('http://localhost:5000/api/signup', { username, password });
-            alert('Signup successful! Please login.');
-            setIsLogin(true); // Volta para a tela de login após o cadastro
+            console.log('Tentando cadastrar com:', { username, password, role });
+            
+            if (!username || !password) {
+                setError('Username e senha são obrigatórios');
+                return;
+            }
+
+            const response = await axiosInstance.post('/api/users/signup', {
+                username: username.trim(),
+                password: password.trim(),
+                role
+            });
+
+            console.log('Resposta do cadastro:', response.data);
+            setError('');
+            alert('Cadastro realizado com sucesso! Por favor, faça login.');
+            setIsLogin(true);
         } catch (error) {
-            console.error('Signup failed:', error);
-            alert('Signup failed. Please try again.');
+            console.error('Erro detalhado do cadastro:', {
+                message: error.message,
+                response: error.response?.data,
+                status: error.response?.status
+            });
+            
+            if (error.response?.status === 400) {
+                setError('Dados inválidos ou usuário já existe');
+            } else if (error.response?.status === 404) {
+                setError('Servidor não encontrado. Verifique se o backend está rodando.');
+            } else {
+                setError(error.response?.data?.message || 'Erro no cadastro. Tente novamente.');
+            }
         }
     };
 
     return (
-        <div className="login-container">
-            <div className="login-box">
-                <h1>{isLogin ? 'Login' : 'Sign Up'}</h1>
-                <input
-                    type="text"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="login-input"
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="login-input"
-                />
-                <button onClick={isLogin ? handleLogin : handleSignup} className="login-button">
-                    {isLogin ? 'Login' : 'Sign Up'}
-                </button>
-                <p className="toggle-text">
-                    {isLogin ? "Don't have an account? " : "Already have an account? "}
-                    <span onClick={() => setIsLogin(!isLogin)} className="toggle-link">
-                        {isLogin ? 'Sign Up' : 'Login'}
-                    </span>
-                </p>
-            </div>
-        </div>
+        <LoginForm
+            username={username}
+            password={password}
+            isLogin={isLogin}
+            role={role}
+            setUsername={setUsername}
+            setPassword={setPassword}
+            setRole={setRole}
+            onSubmit={handleSubmit}
+            setIsLogin={setIsLogin}
+            error={error}
+        />
     );
 };
 
